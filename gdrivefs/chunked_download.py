@@ -148,5 +148,16 @@ class ChunkedDownload(object):
                         self._total_size), \
                     self._done, \
                     self._total_size)
+
+        elif resp.status == 416:
+            if self._total_size is None:
+                self._total_size = 0
+
+            self._done = self._progress == self._total_size
+
+            return (apiclient.http.MediaDownloadProgress(
+                        self._progress, self._total_size),
+                    self._done, self._total_size)
+
         else:
             raise apiclient.errors.HttpError(resp, content, uri=self._uri)
